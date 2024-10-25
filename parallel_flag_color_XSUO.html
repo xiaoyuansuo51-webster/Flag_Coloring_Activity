@@ -68,7 +68,7 @@
         function startAnimation() {
             let processors = parseInt(document.getElementById('processors').value);
             if (processors <= 0) {
-                alert("Please enter a valid number of processors.");
+                alert("Please enter a valid number of processors."); //input validation
                 return;
             }
 
@@ -79,9 +79,9 @@
             const pixelsPerSecondPerProcessor = 10;
             const totalPixelsPerSecond = processors * pixelsPerSecondPerProcessor;
             let progress = 0;
-            const totalTime = flagWidth / totalPixelsPerSecond; // Time to fill the flag based on processors
+            const totalTime = flagWidth / totalPixelsPerSecond; // Time 
 
-            if (intervalId) clearInterval(intervalId); // Clear previous timer if present
+            if (intervalId) clearInterval(intervalId); // Clear previous timer 
             intervalId = setInterval(() => {
                 elapsedTime += 0.1;
                 updateElapsedTime();
@@ -93,7 +93,7 @@
                     drawFlag(progress);
                     requestAnimationFrame(step);
                 } else {
-                    clearInterval(intervalId); // Stop the timer when the flag is filled
+                    clearInterval(intervalId); // Stop the timer 
                 }
             }
 
