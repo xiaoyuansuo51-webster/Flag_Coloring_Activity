@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netherlands Flag Animation (Left to Right)</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="flagCanvas" width="300" height="200"></canvas>
+
+    <script>
+        const canvas = document.getElementById('flagCanvas');
+        const context = canvas.getContext('2d');
+
+        const flagColors = ['#AE1C28', '#FFFFFF', '#21468B']; // Red, White, Blue (Netherlands Flag)
+        const flagWidth = canvas.width;
+        const flagHeight = canvas.height / 3;
+        let progress = 0;
+        const animationDuration = 3000; // 3 seconds
+        const framesPerSecond = 60; // Frame rate for smooth animation
+        const totalFrames = animationDuration / (1000 / framesPerSecond); // Total frames for the animation
+
+        function drawFlag(progress) {
+            // Clear the canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw each color band from left to right based on the progress
+            for (let i = 0; i < 3; i++) {
+                context.fillStyle = flagColors[i];
+                context.fillRect(0, i * flagHeight, flagWidth * progress, flagHeight);
+            }
+        }
+
+        function animateFlag() {
+            let frame = 0;
+
+            function step() {
+                // Calculate progress as a percentage of the total width
+                progress = frame / totalFrames;
+
+                // Draw the flag based on current progress
+                drawFlag(progress);
+
+                if (frame < totalFrames) {
+                    frame++;
+                    requestAnimationFrame(step);
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        // Start the flag animation
+        animateFlag();
+    </script>
+</body>
+</html>
