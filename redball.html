@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Ball</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ballCanvas" width="400" height="400"></canvas>
+
+    <script>
+        // Get the canvas element
+        const canvas = document.getElementById('ballCanvas');
+        const context = canvas.getContext('2d');
+
+        // Ball properties
+        const ball = {
+            x: canvas.width / 2,    // Center the ball horizontally
+            y: canvas.height / 2,   // Center the ball vertically
+            radius: 50,             // Set radius of the ball
+            color: 'red'            // Red ball
+        };
+
+        // Function to draw the ball
+        function drawBall() {
+            context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+            // Begin drawing the ball
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2); // Draw a circle
+            context.fillStyle = ball.color; // Set fill color
+            context.fill(); // Fill the circle
+            context.closePath();
+        }
+
+        // Initial drawing of the ball
+        drawBall();
+    </script>
+</body>
+</html>
