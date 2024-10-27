@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Bouncing Balls with Target</title>
+  <style>
+    #gameCanvas {
+      border: 1px solid black;
+      position: relative;
+    }
+    #controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+  <div id="controls">
+    <label for="ballCount">Enter number of red balls: </label>
+    <input type="number" id="ballCount" min="1" />
+    <button onclick="startGame()">Start Game</button>
+    <p id="timeLabel">Time of collision: None</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("Ball Target -- Xiaoyuan Suo");
+    const ctx = canvas.getContext("2d");
+    const ballCountInput = document.getElementById("ballCount");
+    const timeLabel = document.getElementById("timeLabel");
+
+    let balls = [];
+    let target = { x: canvas.width - 20, y: canvas.height / 2, radius: 5 };
+    let animationActive = true;
+    let startTime;
+
+    function randomSpeed() {
+      return Math.random() * 10;
+    }
+
+    function startGame() {
+      balls = [];
+      animationActive = true;
+      const ballCount = parseInt(ballCountInput.value) || 0;
+      timeLabel.textContent = "Time of collision: None";
+      startTime = performance.now();
+
+      // Generate balls based on user input
+      for (let i = 0; i < ballCount; i++) {
+        balls.push({
+          x: 20,
+          y: canvas.height / 2,
+          radius: 5,
+          dx: randomSpeed() * (Math.random() > 0.5 ? 1 : -1),
+          dy: randomSpeed() * (Math.random() > 0.5 ? 1 : -1),
+          hitTarget: false,
+        });
+      }
+      requestAnimationFrame(update);
+    }
+
+    function drawBall(ball) {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawTarget() {
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "blue";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function update() {
+      if (!animationActive) return; // Stop animation if target is hit
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw target and balls
+      drawTarget();
+      balls.forEach((ball) => {
+        if (!ball.hitTarget) {
+          drawBall(ball);
+
+          // Update ball position
+          ball.x += ball.dx;
+          ball.y += ball.dy;
+
+          // Bounce on edges
+          if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+            ball.dx *= -1;
+          }
+          if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+            ball.dy *= -1;
+          }
+
+          // Check for collision with target
+          const distX = ball.x - target.x;
+          const distY = ball.y - target.y;
+          const distance = Math.sqrt(distX * distX + distY * distY);
+
+          if (distance < ball.radius + target.radius) {
+            ball.hitTarget = true;
+            animationActive = false; // Stop animation
+            const collisionTime = ((performance.now() - startTime) / 1000).toFixed(2);
+            timeLabel.textContent = `Time of collision: ${collisionTime} seconds`;
+            
+            // Drop all balls to the bottom
+            balls.forEach((b) => {
+              b.y = canvas.height - b.radius;
+              b.dx = 0;
+              b.dy = 0;
+            });
+          }
+        }
+      });
+
+      if (animationActive) requestAnimationFrame(update);
+    }
+  </script>
+</body>
+</html>
