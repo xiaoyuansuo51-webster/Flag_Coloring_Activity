@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parallel Linked List Access</title>
+  <style>
+    body { display: flex; flex-direction: column; align-items: center; font-family: Arial, sans-serif; }
+    #controls { margin: 20px; }
+    canvas { border: 1px solid #333; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Parallel Access to Linked List</h1>
+  <div id="controls">
+    <label for="operation">Select Operation: </label>
+    <select id="operation">
+      <option value="add">Add 43</option>
+      <option value="addDelete">Add 43 and Delete Node 21</option>
+      <option value="addDeleteFind">Add 43, Delete Node 21, and Find Node 56</option>
+    </select>
+    <button onclick="startOperation()">Run</button>
+  </div>
+  <canvas id="linkedListCanvas" width="1000" height="250"></canvas>
+
+  <script>
+    const canvas = document.getElementById("linkedListCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let nodes = [9, 15, 17, 18, 21, 23, 41, 42, 56, 67, 73, 91, 93, 97];
+    const NODE_WIDTH = 60;
+    const NODE_HEIGHT = 30;
+    const NODE_SPACING = 10;
+    const START_X = 20;
+
+    function drawLinkedList() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      nodes.forEach((value, index) => {
+        const x = START_X + index * (NODE_WIDTH + NODE_SPACING);
+        ctx.fillStyle = "#4CAF50";
+        ctx.fillRect(x, 100, NODE_WIDTH, NODE_HEIGHT);
+        ctx.fillStyle = "#fff";
+        ctx.fillText(value, x + NODE_WIDTH / 2 - 10, 120);
+
+        if (index < nodes.length - 1) {
+          ctx.beginPath();
+          ctx.moveTo(x + NODE_WIDTH, 115);
+          ctx.lineTo(x + NODE_WIDTH + NODE_SPACING / 2, 115);
+          ctx.stroke();
+        }
+      });
+    }
+
+    function startOperation() {
+      const operation = document.getElementById("operation").value;
+      resetList();
+      drawLinkedList();
+
+      if (operation === "add") {
+        animateOperation([{ color: "green", operation: "add", targetValue: 43 }]);
+      } else if (operation === "addDelete") {
+        animateOperation([
+          { color: "green", operation: "add", targetValue: 43 },
+          { color: "blue", operation: "delete", targetValue: 21 }
+        ]);
+      } else if (operation === "addDeleteFind") {
+        animateOperation([
+          { color: "green", operation: "add", targetValue: 43 },
+          { color: "blue", operation: "delete", targetValue: 21 },
+          { color: "red", operation: "find", targetValue: 56 }
+        ]);
+      }
+    }
+
+    function resetList() {
+      nodes = [9, 15, 17, 18, 21, 23, 41, 42, 56, 67, 73, 91, 93, 97];
+    }
+
+    function animateOperation(processors) {
+      processors.forEach((processor, index) => {
+        processor.currentNode = 0;
+        processor.xPosition = START_X;
+        processor.interval = setInterval(() => {
+          const x = START_X + processor.currentNode * (NODE_WIDTH + NODE_SPACING);
+          processor.xPosition = x;
+
+          drawLinkedList();
+          drawArrowhead(x, processor.color, processor.operation, index);
+
+          const currentNodeValue = nodes[processor.currentNode];
+          if (performOperation(processor, currentNodeValue)) {
+            clearInterval(processor.interval);
+          } else {
+            processor.currentNode++;
+            if (processor.currentNode >= nodes.length) clearInterval(processor.interval);
+          }
+        }, 1000);
+      });
+    }
+
+    function drawArrowhead(x, color, operation, index) {
+      ctx.beginPath();
+      const y = operation === "delete" ? 150 : 90; 
+      const offset = index * 10; // Different offset for each arrow
+      ctx.moveTo(x + NODE_WIDTH / 2 + offset, y);
+      ctx.lineTo(x + NODE_WIDTH / 2 + offset, y - 10);
+      ctx.strokeStyle = color;
+      ctx.stroke();
+    }
+
+    function performOperation(processor, currentNodeValue) {
+      if (processor.operation === "add" && currentNodeValue > processor.targetValue) {
+        nodes.splice(processor.currentNode, 0, processor.targetValue);
+        return true;
+      } else if (processor.operation === "delete" && currentNodeValue === processor.targetValue) {
+        nodes.splice(processor.currentNode, 1);
+        return true;
+      } else if (processor.operation === "find" && currentNodeValue === processor.targetValue) {
+        ctx.fillStyle = "red";
+        ctx.fillText("Found " + processor.targetValue, processor.xPosition, 70);
+        return true;
+      }
+      return false;
+    }
+
+    drawLinkedList();
+  </script>
+</body>
+</html>
