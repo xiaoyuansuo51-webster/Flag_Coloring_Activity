@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flag Coloring Activity</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      background-color: #f0f0f0;
+    }
+    svg {
+      border: 1px solid black;
+      margin-top: 10px;
+    }
+    #timeElapsed {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Flag Coloring Activity</h1>
+    <h3>Xiaoyuan Suo</h3>
+    <h3>xiaoyuansuo51@webster.edu</h3>
+  </div>
+  <div>
+    <label for="processors">Enter number of processors: </label>
+    <input type="number" id="processors" value="1" min="1" max="30">
+    <br>
+    <label for="country">Select Country: </label>
+    <select id="country">
+      <option value="armenia">Armenia</option>
+      <option value="austria">Austria</option>
+      <option value="bulgaria">Bulgaria</option>
+      <option value="estonia">Estonia</option>
+      <option value="gabon">Gabon</option>
+      <option value="germany">Germany</option>
+      <option value="hungary">Hungary</option>
+      <option value="lithuania">Lithuania</option>
+      <option value="luxembourg">Luxembourg</option>
+      <option value="netherlands">Netherlands</option>
+      <option value="russia">Russia</option>
+      <option value="sierra leone">Sierra Leone</option>
+      <option value="yemen">Yemen</option>
+    </select>
+    <button onclick="startAnimation()">Start</button>
+  </div>
+  <svg id="flagSVG" width="300" height="200"></svg>
+  <div id="timeElapsed">Time elapsed: 0.0 seconds</div>
+
+
+  <script>
+    const svgElement = document.getElementById('flagSVG');
+    const countries = [
+      { name: "armenia", colors: ["#D90012", "#001489", "#FF9E1B"] },
+      { name: "austria", colors: ["#EF3340", "#FFFFFF", "#EF3340"] },
+      { name: "bulgaria", colors: ["#FFFFFF", "#00966E", "#D62612"] },
+      { name: "estonia", colors: ["#0072CE", "#000000", "#FFFFFF"] },
+      { name: "gabon", colors: ["#009E60", "#FCD116", "#4664B2"] },
+      { name: "germany", colors: ["#000000", "#DD0000", "#FFCC00"] },
+      { name: "hungary", colors: ["#CE2939", "#FFFFFF", "#477050"] },
+      { name: "lithuania", colors: ["#FFB81C", "#046A38", "#BE3A34"] },
+      { name: "luxembourg", colors: ["#EA141D", "#FFFFFF", "#51ADDA"] },
+      { name: "netherlands", colors: ["#C8102E", "#FFFFFF", "#003DA5"] },
+      { name: "russia", colors: ["#FFFFFF", "#1C3578", "#E4181C"] },
+      { name: "sierra leone", colors: ["#1EB53A", "#FFFFFF", "#0072C6"] },
+      { name: "yemen", colors: ["#CE1126", "#FFFFFF", "#000000"] }
+    ];
+
+
+    let elapsedTime = 0;
+    let intervalId = null;
+
+
+    function clearSvg() {
+      while (svgElement.firstChild) {
+        svgElement.removeChild(svgElement.firstChild);
+      }
+    }
+
+
+    function drawFlag(progress, colors) {
+      const rectWidth = progress;
+      const rectHeight = 67; // Each stripe height
+
+
+      for (let i = 0; i < 3; i++) {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", 0);
+        rect.setAttribute("y", i * rectHeight);
+        rect.setAttribute("width", rectWidth);
+        rect.setAttribute("height", rectHeight);
+        rect.style.fill = colors[i];
+        svgElement.appendChild(rect);
+      }
+    }
+
+
+    function updateElapsedTime() {
+      const timeDisplay = document.getElementById('timeElapsed');
+      timeDisplay.textContent = `Time elapsed: ${elapsedTime.toFixed(2)} seconds`;
+    }
+
+
+    function startAnimation() {
+      const selectedCountry = document.getElementById('country').value;
+      const selectedCountryData = countries.find(country => country.name === selectedCountry);
+      const flagColors = selectedCountryData.colors;
+
+
+      let processors = parseInt(document.getElementById('processors').value);
+      if (processors <= 0) {
+        alert("Please enter a valid number of processors.");
+        return;
+      }
+
+
+      clearSvg();
+      elapsedTime = 0;
+      updateElapsedTime();
+
+
+      const pixelsPerSecondPerProcessor = 10;
+      const totalPixelsPerSecond = processors * pixelsPerSecondPerProcessor;
+      let progress = 0;
+      const totalTime = progress / totalPixelsPerSecond; // Time
+
+
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        elapsedTime += 0.1;
+        updateElapsedTime();
+      }, 100);
+
+
+      function step() {
+        if (progress < 300) {
+          progress += totalPixelsPerSecond / 60;
+          drawFlag(progress, flagColors);
+          requestAnimationFrame(step);
+        } else {
+          clearInterval(intervalId);
+        }
+      }
+
+
+      step();
+    }
+  </script>
+</body>
+</html>
