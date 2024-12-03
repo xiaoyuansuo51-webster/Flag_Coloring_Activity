@@ -77,27 +77,43 @@
     }
 
     function animateOperation(processors) {
-      processors.forEach((processor, index) => {
+      let currentProcessorIndex = 0;
+
+      function processNextOperation() {
+        const processor = processors[currentProcessorIndex];
         processor.currentNode = 0;
         processor.xPosition = START_X;
-        processor.interval = setInterval(() => {
+
+        const interval = setInterval(() => {
           const x = START_X + processor.currentNode * (NODE_WIDTH + NODE_SPACING);
           processor.xPosition = x;
 
           drawLinkedList();
-          drawArrowhead(x, processor.color, processor.operation, index);
+          drawArrowhead(x, processor.color, processor.operation, currentProcessorIndex);
 
           const currentNodeValue = nodes[processor.currentNode];
           if (performOperation(processor, currentNodeValue)) {
-            clearInterval(processor.interval);
+            clearInterval(interval);
+            currentProcessorIndex++;
+            if (currentProcessorIndex < processors.length) {
+              processNextOperation();
+            }
           } else {
             processor.currentNode++;
-            if (processor.currentNode >= nodes.length) clearInterval(processor.interval);
+            if (processor.currentNode >= nodes.length) {
+              clearInterval(interval);
+              currentProcessorIndex++;
+              if (currentProcessorIndex < processors.length) {
+                processNextOperation();
+              }
+            }
           }
         }, 1000);
-      });
-    }
+      }
 
+      processNextOperation();
+    }
+    
     function drawArrowhead(x, color, operation, index) {
       ctx.beginPath();
       const y = operation === "delete" ? 150 : 90; 
