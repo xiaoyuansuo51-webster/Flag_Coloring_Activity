@@ -77,55 +77,48 @@
     }
 
     function animateOperation(processors) {
-      let currentProcessorIndex = 0;
-
-      function processNextOperation() {
-        const processor = processors[currentProcessorIndex];
+      processors.forEach((processor, index) => {
         processor.currentNode = 0;
         processor.xPosition = START_X;
-
-        const interval = setInterval(() => {
+        processor.interval = setInterval(() => {
           const x = START_X + processor.currentNode * (NODE_WIDTH + NODE_SPACING);
           processor.xPosition = x;
 
           drawLinkedList();
-          drawArrowhead(x, processor.color, processor.operation, currentProcessorIndex);
+          drawArrowheads(processors);
 
           const currentNodeValue = nodes[processor.currentNode];
           if (performOperation(processor, currentNodeValue)) {
-            clearInterval(interval);
-            currentProcessorIndex++;
-            if (currentProcessorIndex < processors.length) {
-              processNextOperation();
+            clearInterval(processor.interval);
+            if (processor.operation != "find") {
+              drawLinkedList();
             }
           } else {
             processor.currentNode++;
             if (processor.currentNode >= nodes.length) {
-              clearInterval(interval);
-              currentProcessorIndex++;
-              if (currentProcessorIndex < processors.length) {
-                processNextOperation();
-              }
+              clearInterval(processor.interval);
             }
           }
         }, 1000);
-      }
+      });
+    }
 
-      processNextOperation();
+    function drawArrowheads(processors) {
+      processors.forEach((processor, index) => {
+        const x = START_X + processor.currentNode * (NODE_WIDTH + NODE_SPACING);
+        const y = processor.operation === "delete" ? 150 : 90;
+        const offset = index * 10; // Different offset for each arrow
+
+        ctx.beginPath();
+        ctx.moveTo(x + NODE_WIDTH / 2 + offset, y);
+        ctx.lineTo(x + NODE_WIDTH / 2 + offset, y - 10);
+        ctx.strokeStyle = processor.color;
+        ctx.stroke();
+      });
     }
     
-    function drawArrowhead(x, color, operation, index) {
-      ctx.beginPath();
-      const y = operation === "delete" ? 150 : 90; 
-      const offset = index * 10; // Different offset for each arrow
-      ctx.moveTo(x + NODE_WIDTH / 2 + offset, y);
-      ctx.lineTo(x + NODE_WIDTH / 2 + offset, y - 10);
-      ctx.strokeStyle = color;
-      ctx.stroke();
-    }
-
     function performOperation(processor, currentNodeValue) {
-      if (processor.operation === "add" && currentNodeValue > processor.targetValue) {
+      if (processor.operation === "add" && currentNodeValue >= processor.targetValue) {
         nodes.splice(processor.currentNode, 0, processor.targetValue);
         return true;
       } else if (processor.operation === "delete" && currentNodeValue === processor.targetValue) {
