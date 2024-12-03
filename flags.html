@@ -110,10 +110,14 @@
 
 
     function startAnimation() {
+      if (intervalId) {
+        clearInterval(intervalId); // Clear the previous interval if it exists
+        intervalId = null;
+      }
+
       const selectedCountry = document.getElementById('country').value;
       const selectedCountryData = countries.find(country => country.name === selectedCountry);
       const flagColors = selectedCountryData.colors;
-
 
       let processors = parseInt(document.getElementById('processors').value);
       if (processors <= 0) {
@@ -121,11 +125,9 @@
         return;
       }
 
-
       clearSvg();
       elapsedTime = 0;
       updateElapsedTime();
-
 
       const pixelsPerSecondPerProcessor = 10;
       const totalPixelsPerSecond = processors * pixelsPerSecondPerProcessor;
@@ -142,6 +144,7 @@
 
       function step() {
         if (progress < 300) {
+          clearSvg();
           progress += totalPixelsPerSecond / 60;
           drawFlag(progress, flagColors);
           requestAnimationFrame(step);
@@ -149,7 +152,6 @@
           clearInterval(intervalId);
         }
       }
-
 
       step();
     }
