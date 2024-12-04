@@ -85,31 +85,40 @@
           processor.xPosition = x;
 
           drawLinkedList();
-          drawArrowhead(x, processor.color, processor.operation, index);
+          drawArrowheads(processors);
 
           const currentNodeValue = nodes[processor.currentNode];
           if (performOperation(processor, currentNodeValue)) {
             clearInterval(processor.interval);
+            if (processor.operation != "find") {
+              drawLinkedList();
+            }
           } else {
             processor.currentNode++;
-            if (processor.currentNode >= nodes.length) clearInterval(processor.interval);
+            if (processor.currentNode >= nodes.length) {
+              clearInterval(processor.interval);
+            }
           }
         }, 1000);
       });
     }
 
-    function drawArrowhead(x, color, operation, index) {
-      ctx.beginPath();
-      const y = operation === "delete" ? 150 : 90; 
-      const offset = index * 10; // Different offset for each arrow
-      ctx.moveTo(x + NODE_WIDTH / 2 + offset, y);
-      ctx.lineTo(x + NODE_WIDTH / 2 + offset, y - 10);
-      ctx.strokeStyle = color;
-      ctx.stroke();
-    }
+    function drawArrowheads(processors) {
+      processors.forEach((processor, index) => {
+        const x = START_X + processor.currentNode * (NODE_WIDTH + NODE_SPACING);
+        const y = processor.operation === "delete" ? 150 : 90;
+        const offset = index * 10; // Different offset for each arrow
 
+        ctx.beginPath();
+        ctx.moveTo(x + NODE_WIDTH / 2 + offset, y);
+        ctx.lineTo(x + NODE_WIDTH / 2 + offset, y - 10);
+        ctx.strokeStyle = processor.color;
+        ctx.stroke();
+      });
+    }
+    
     function performOperation(processor, currentNodeValue) {
-      if (processor.operation === "add" && currentNodeValue > processor.targetValue) {
+      if (processor.operation === "add" && currentNodeValue >= processor.targetValue) {
         nodes.splice(processor.currentNode, 0, processor.targetValue);
         return true;
       } else if (processor.operation === "delete" && currentNodeValue === processor.targetValue) {
